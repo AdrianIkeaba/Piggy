@@ -1,5 +1,6 @@
 package com.ghostdev.piggy.ui.view
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -29,6 +33,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -37,10 +44,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +63,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -62,7 +74,15 @@ import androidx.navigation.NavController
 import com.ghostdev.piggy.R
 import com.ghostdev.piggy.ui.theme.Inter
 import com.ghostdev.piggy.ui.theme.KronaOne
+import com.ghostdev.piggy.ui.theme.colorEight
+import com.ghostdev.piggy.ui.theme.colorFive
+import com.ghostdev.piggy.ui.theme.colorFour
+import com.ghostdev.piggy.ui.theme.colorNine
 import com.ghostdev.piggy.ui.theme.colorOne
+import com.ghostdev.piggy.ui.theme.colorSeven
+import com.ghostdev.piggy.ui.theme.colorSix
+import com.ghostdev.piggy.ui.theme.colorThree
+import com.ghostdev.piggy.ui.theme.colorTwo
 import com.ghostdev.piggy.ui.theme.leftButtonColor
 import com.ghostdev.piggy.ui.theme.premiumPrimary
 import com.ghostdev.piggy.ui.theme.premiumSecondary
@@ -72,16 +92,27 @@ import com.ghostdev.piggy.ui.theme.secondary
 import com.ghostdev.piggy.ui.theme.tertiary
 import com.ghostdev.piggy.ui.view.customcomposables.AutoResizeText
 import com.ghostdev.piggy.ui.view.customcomposables.FontSizeRange
+import com.ghostdev.piggy.ui.view.customcomposables.WavesLevelIndicator
 import com.ghostdev.piggy.ui.view.viewmodel.BottomSheetViewModel
+import com.ghostdev.piggy.ui.view.viewmodel.CalendarViewModel
+import com.ghostdev.piggy.ui.view.viewmodel.ColorViewModel
+import com.ghostdev.piggy.utils.formatDate
+import com.ghostdev.piggy.utils.formatDecimalSeparator
 import kotlinx.coroutines.launch
-
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(controller: NavController) {
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = rememberStandardBottomSheetState(skipHiddenState = false))
-    var showDialog by remember { mutableStateOf(false) }
+    var createDialogShow by remember { mutableStateOf(false) }
 
     BottomSheetScaffold(
         modifier = Modifier.pointerInput(Unit) {
@@ -137,16 +168,16 @@ fun HomeScreen(controller: NavController) {
                 contentAlignment = Alignment.Center
             ) {
                 Column {
-                    Image(painter = painterResource(id = R.drawable.no_piggy_banks),
-                        contentDescription = "No Piggy Banks",
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    Text(text = "Create a new piggy bank to start saving!",
-                        textAlign = TextAlign.Center,
-                        color = Color.Black,
-                        fontFamily = KronaOne,
-                        modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-                    )
+                        Image(painter = painterResource(id = R.drawable.no_piggy_banks),
+                            contentDescription = "No Piggy Banks",
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        Text(text = "Create a new piggy bank to start saving!",
+                            textAlign = TextAlign.Center,
+                            color = Color.Black,
+                            fontFamily = KronaOne,
+                            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                        )
                 }
             }
 
@@ -170,20 +201,19 @@ fun HomeScreen(controller: NavController) {
                     },
                     floatingActionButton = {
                         FloatingActionButton(
-                            onClick = { /* do something */ },
+                            onClick = { createDialogShow = true },
                             containerColor = tertiary,
                             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                         ) {
-                            Icon(Icons.Filled.Add, "Add PiggyBank", tint = Color.White,
-                                modifier = Modifier.clickable { showDialog = true })
+                            Icon(Icons.Filled.Add, "Add PiggyBank", tint = Color.White, modifier = Modifier.clickable { createDialogShow = true })
                         }
                     }
                 )
             }
         }
     }
-    if (showDialog) {
-        CreateNewPiggy(onDismiss = { showDialog = false })
+    if (createDialogShow) {
+        CreateNewPiggy(onDismiss = { createDialogShow = false } )
     }
 }
 
@@ -236,20 +266,35 @@ fun BottomSheetContent(viewModel: BottomSheetViewModel = viewModel()) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateNewPiggy(onDismiss: () -> Unit) {
+fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(), calendarViewModel: CalendarViewModel = viewModel()) {
     var piggyName by remember { mutableStateOf("") }
     var saved by remember { mutableStateOf("") }
     var goal by remember { mutableStateOf("") }
-    val deadline by remember { mutableStateOf("Deadline (Optional)") }
+    var deadline by remember { mutableStateOf("Deadline (Optional)") }
     val color by remember { mutableStateOf("Color") }
+    val selectedColor by viewModel.selectedColor.collectAsState()
+    val deadlineDate by calendarViewModel.selectedDate.collectAsState()
+
 
     var colorDialogShow by remember { mutableStateOf(false) }
+    var calendarDialogShow by remember { mutableStateOf(false) }
 
-    Dialog(onDismissRequest = { onDismiss() }) {
+    if (deadlineDate.isNotEmpty()) {
+        deadline = deadlineDate
+    }
+
+    Dialog(onDismissRequest = {
+        viewModel.resetColor()
+        onDismiss()
+        calendarViewModel.selectDate("")}) {
         Card(
-            modifier = Modifier.wrapContentHeight(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFEEF1ED))
+            modifier = Modifier
+                .wrapContentHeight(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFEEF1ED) // Adjust color as needed
+            )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
@@ -282,7 +327,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit) {
 
                 OutlinedTextField(
                     value = saved,
-                    onValueChange = { saved = it },
+                    onValueChange = { saved = it.formatDecimalSeparator() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 5.dp),
@@ -301,7 +346,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit) {
 
                 OutlinedTextField(
                     value = goal,
-                    onValueChange = { goal = it },
+                    onValueChange = { goal = it.formatDecimalSeparator() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp),
@@ -323,6 +368,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit) {
                     onValueChange = { },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable { calendarDialogShow = true }
                         .padding(bottom = 10.dp),
                     enabled = false,
                     shape = RoundedCornerShape(12.dp),
@@ -350,49 +396,180 @@ fun CreateNewPiggy(onDismiss: () -> Unit) {
 
                 OutlinedTextField(
                     value = color,
-                    onValueChange = { },
+                    onValueChange = {  },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 10.dp),
-                    enabled = false,
+                        .clickable { colorDialogShow = true }
+                        .padding(bottom = 30.dp),
                     shape = RoundedCornerShape(12.dp),
+                    enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Gray,
                         focusedBorderColor = Color.Black,
                         cursorColor = Color.Black,
                         focusedLabelColor = Color.Black,
                         focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
                         disabledBorderColor = Color.Gray,
-                        disabledTextColor = Color.Black,
-                        disabledTrailingIconColor = Color.Gray
+                        disabledTextColor = Color.Black
                     ),
                     trailingIcon = {
-                        Box(
+                        Icon(
+                            painter = painterResource(id = R.drawable.color_box),
+                            contentDescription = "Color Box",
                             modifier = Modifier
                                 .size(48.dp)
-                                .padding(8.dp)
-                                .background(colorOne)
-                                .clickable {
-                                    colorDialogShow = true
-                                }
+                                .padding(8.dp),
+                            tint = selectedColor ?: colorOne
                         )
-                    }
+                    },
                 )
 
-                Button(
-                    onClick = { onDismiss() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .padding(top = 10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = tertiary),
-                    shape = RoundedCornerShape(12.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text = "Create", color = Color.White)
+                    Text(
+                        text = "Discard",
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .clickable {
+                                onDismiss()
+                                calendarViewModel.selectDate("")
+                                viewModel.resetColor()
+                            },
+                        fontSize = 16.sp,
+                        color = Color.Gray // Adjust color as needed
+                    )
+                    Text(
+                        text = "Save",
+                        modifier = Modifier.padding(end = 16.dp),
+                        fontSize = 16.sp,
+                        color = Color.Gray // Adjust color as needed
+                    )
+                }
+            }
+        }
+    }
+    if (colorDialogShow) {
+        ColorDialog(onDismiss = {colorDialogShow = false})
+    }
+    if (calendarDialogShow) {
+        CalendarDialog(onDismiss = {calendarDialogShow = false})
+    }
+}
+
+@Composable
+fun ColorDialog(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel()) {
+    val selectedColor by viewModel.selectedColor.collectAsState()
+
+    Dialog(onDismissRequest = {
+        onDismiss() }) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFEEF1ED)
+            )
+        ) {
+            val colors = listOf(
+                colorOne, colorTwo, colorThree,
+                colorFour, colorFive, colorSix,
+                colorSeven, colorEight, colorNine
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                items(colors) { color ->
+                    Card(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(8.dp)
+                            .clickable {
+                                viewModel.selectColor(color)
+                                onDismiss()
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = color
+                        ),
+                        border = if (selectedColor == color) {
+                            BorderStroke(2.dp, Color.Black)
+                        } else {
+                            BorderStroke(2.dp, Color.Transparent)
+                        }
+                    ) {}
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CalendarDialog(onDismiss: () -> Unit, viewModel: CalendarViewModel = viewModel()) {
+    val datePickerState = rememberDatePickerState()
+    val currentDateMillis = System.currentTimeMillis()
+
+    val dateValidator: (Long?) -> Boolean = { date ->
+        date != null && date >= currentDateMillis
+    }
+    val confirmEnabled = remember {
+        derivedStateOf { datePickerState.selectedDateMillis != null && dateValidator(datePickerState.selectedDateMillis) }
+    }
+
+    DatePickerDialog(
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            TextButton(onClick = {
+                if (datePickerState.selectedDateMillis != null) {
+                    viewModel.selectDate(formatDate(datePickerState.selectedDateMillis!!))
+                    onDismiss()
+                }
+            }, enabled = confirmEnabled.value) {
+                Text(text = "Confirm", fontSize = 16.sp, color = Color.Black)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text(text = "Cancel", fontSize = 16.sp, color = Color.Black)
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState, dateValidator = dateValidator)
+    }
+}
+
+@Composable
+@Preview
+fun PiggyBank() {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(300.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(2.dp, Color.Black),
+        colors = CardDefaults.cardColors(
+            containerColor = colorFive
+        )
+     ) {
+        Box(modifier = Modifier
+            .height(300.dp)
+            .fillMaxWidth()) {
+
+            WavesLevelIndicator(modifier = Modifier, color = colorSeven, progress = 0.34f)
+
+            Row(modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Piggy Name", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+
+                IconButton(onClick = { }) {
+                    Icon(painter = painterResource(id = R.drawable.pin_outlined), contentDescription = "Pin", tint = Color.Black)
+                }
+            }
+        }
+    }
+}
