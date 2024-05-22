@@ -1,5 +1,6 @@
 package com.ghostdev.piggy.ui.view
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -61,7 +63,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -88,10 +92,12 @@ import com.ghostdev.piggy.ui.theme.secondary
 import com.ghostdev.piggy.ui.theme.tertiary
 import com.ghostdev.piggy.ui.view.customcomposables.AutoResizeText
 import com.ghostdev.piggy.ui.view.customcomposables.FontSizeRange
+import com.ghostdev.piggy.ui.view.customcomposables.WavesLevelIndicator
 import com.ghostdev.piggy.ui.view.viewmodel.BottomSheetViewModel
 import com.ghostdev.piggy.ui.view.viewmodel.CalendarViewModel
 import com.ghostdev.piggy.ui.view.viewmodel.ColorViewModel
 import com.ghostdev.piggy.utils.formatDate
+import com.ghostdev.piggy.utils.formatDecimalSeparator
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -321,7 +327,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
 
                 OutlinedTextField(
                     value = saved,
-                    onValueChange = { saved = it },
+                    onValueChange = { saved = it.formatDecimalSeparator() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 5.dp),
@@ -340,7 +346,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
 
                 OutlinedTextField(
                     value = goal,
-                    onValueChange = { goal = it },
+                    onValueChange = { goal = it.formatDecimalSeparator() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp),
@@ -426,9 +432,10 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
                         text = "Discard",
                         modifier = Modifier
                             .padding(end = 16.dp)
-                            .clickable { onDismiss()
-                                       calendarViewModel.selectDate("")
-                                        viewModel.resetColor()
+                            .clickable {
+                                onDismiss()
+                                calendarViewModel.selectDate("")
+                                viewModel.resetColor()
                             },
                         fontSize = 16.sp,
                         color = Color.Gray // Adjust color as needed
@@ -531,5 +538,38 @@ fun CalendarDialog(onDismiss: () -> Unit, viewModel: CalendarViewModel = viewMod
         }
     ) {
         DatePicker(state = datePickerState, dateValidator = dateValidator)
+    }
+}
+
+@Composable
+@Preview
+fun PiggyBank() {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(300.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(2.dp, Color.Black),
+        colors = CardDefaults.cardColors(
+            containerColor = colorFive
+        )
+     ) {
+        Box(modifier = Modifier
+            .height(300.dp)
+            .fillMaxWidth()) {
+
+            WavesLevelIndicator(modifier = Modifier, color = colorSeven, progress = 0.34f)
+
+            Row(modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Piggy Name", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+
+                IconButton(onClick = { }) {
+                    Icon(painter = painterResource(id = R.drawable.pin_outlined), contentDescription = "Pin", tint = Color.Black)
+                }
+            }
+        }
     }
 }
