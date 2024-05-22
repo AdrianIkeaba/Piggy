@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -58,15 +57,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ghostdev.piggy.R
 import com.ghostdev.piggy.ui.theme.Inter
 import com.ghostdev.piggy.ui.theme.KronaOne
 import com.ghostdev.piggy.ui.theme.colorOne
-import com.ghostdev.piggy.ui.theme.colorThree
-import com.ghostdev.piggy.ui.theme.cursorColor
 import com.ghostdev.piggy.ui.theme.leftButtonColor
 import com.ghostdev.piggy.ui.theme.premiumPrimary
 import com.ghostdev.piggy.ui.theme.premiumSecondary
@@ -78,9 +74,6 @@ import com.ghostdev.piggy.ui.view.customcomposables.AutoResizeText
 import com.ghostdev.piggy.ui.view.customcomposables.FontSizeRange
 import com.ghostdev.piggy.ui.view.viewmodel.BottomSheetViewModel
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -248,17 +241,15 @@ fun CreateNewPiggy(onDismiss: () -> Unit) {
     var piggyName by remember { mutableStateOf("") }
     var saved by remember { mutableStateOf("") }
     var goal by remember { mutableStateOf("") }
-    var deadline by remember { mutableStateOf("Deadline (Optional)") }
-    var color by remember { mutableStateOf("Color") }
+    val deadline by remember { mutableStateOf("Deadline (Optional)") }
+    val color by remember { mutableStateOf("Color") }
+
+    var colorDialogShow by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
-            modifier = Modifier
-                .wrapContentHeight()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = primary // Adjust color as needed
-            )
+            modifier = Modifier.wrapContentHeight(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFEEF1ED))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
@@ -359,51 +350,46 @@ fun CreateNewPiggy(onDismiss: () -> Unit) {
 
                 OutlinedTextField(
                     value = color,
-                    onValueChange = {  },
+                    onValueChange = { },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 30.dp),
-                    shape = RoundedCornerShape(12.dp),
+                        .padding(bottom = 10.dp),
                     enabled = false,
+                    shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Gray,
                         focusedBorderColor = Color.Black,
                         cursorColor = Color.Black,
                         focusedLabelColor = Color.Black,
                         focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
                         disabledBorderColor = Color.Gray,
-                        disabledTextColor = Color.Black
+                        disabledTextColor = Color.Black,
+                        disabledTrailingIconColor = Color.Gray
                     ),
                     trailingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.color_box),
-                            contentDescription = "Color Box",
+                        Box(
                             modifier = Modifier
                                 .size(48.dp)
-                                .padding(8.dp),
-                            tint = colorThree
+                                .padding(8.dp)
+                                .background(colorOne)
+                                .clickable {
+                                    colorDialogShow = true
+                                }
                         )
                     }
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                Button(
+                    onClick = { onDismiss() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .padding(top = 10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = tertiary),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(
-                        text = "Discard",
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .clickable { onDismiss() },
-                        fontSize = 16.sp,
-                        color = Color.Gray // Adjust color as needed
-                    )
-                    Text(
-                        text = "Save",
-                        modifier = Modifier.padding(end = 16.dp),
-                        fontSize = 16.sp,
-                        color = Color.Gray // Adjust color as needed
-                    )
+                    Text(text = "Create", color = Color.White)
                 }
             }
         }
