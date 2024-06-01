@@ -1,4 +1,4 @@
-package com.ghostdev.piggy.ui.view
+package com.ghostdev.piggy.presentation.view.ui.onboarding
 
 import android.os.Build.VERSION.SDK_INT
 import androidx.compose.animation.core.Animatable
@@ -38,10 +38,10 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.ghostdev.piggy.R
 import com.ghostdev.piggy.data.navigation.NavDestinations
-import com.ghostdev.piggy.ui.theme.KronaOne
-import com.ghostdev.piggy.ui.theme.primary
-import com.ghostdev.piggy.ui.theme.tertiary
-import com.ghostdev.piggy.ui.theme.tertiary2
+import com.ghostdev.piggy.presentation.theme.KronaOne
+import com.ghostdev.piggy.presentation.theme.primary
+import com.ghostdev.piggy.presentation.theme.tertiary
+import com.ghostdev.piggy.presentation.theme.tertiary2
 import kotlinx.coroutines.delay
 
 @Composable

@@ -1,4 +1,4 @@
-package com.ghostdev.piggy.ui.theme
+package com.ghostdev.piggy.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

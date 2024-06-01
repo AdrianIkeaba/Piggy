@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.ghostdev.piggy.ui.view.HomeScreen
-import com.ghostdev.piggy.ui.view.OnboardingScreen
+import com.ghostdev.piggy.presentation.view.ui.home.HomeScreen
+import com.ghostdev.piggy.presentation.view.ui.onboarding.OnboardingScreen
 
 @Composable
 fun NavGraph(controller: NavHostController) {
@@ -14,7 +14,7 @@ fun NavGraph(controller: NavHostController) {
             OnboardingScreen(controller)
         }
         composable(NavDestinations.Home.toString()) {
-            HomeScreen(controller)
+            HomeScreen()
         }
     }
 }

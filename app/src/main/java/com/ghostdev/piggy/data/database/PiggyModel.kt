@@ -4,19 +4,19 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "piggy_table")
 data class PiggyModel(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
 
     @ColumnInfo("name")
-    val  piggyName: String,
+    val piggyName: String,
 
     @ColumnInfo("saved")
-    val amountSaved: Float,
+    val amountSaved: Double,
 
     @ColumnInfo("goal")
-    val goal: Float,
+    val goal: Double,
 
     @ColumnInfo("deadline")
     val deadlineDate: String,

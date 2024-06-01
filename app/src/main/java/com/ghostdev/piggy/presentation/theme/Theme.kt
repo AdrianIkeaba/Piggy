@@ -1,4 +1,4 @@
-package com.ghostdev.piggy.ui.theme
+package com.ghostdev.piggy.presentation.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

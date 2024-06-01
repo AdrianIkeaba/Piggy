@@ -1,4 +1,4 @@
-package com.ghostdev.piggy.ui.view.viewmodel
+package com.ghostdev.piggy.presentation.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
