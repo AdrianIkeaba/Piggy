@@ -81,18 +81,18 @@ fun OnboardingScreen(controller: NavController) {
         .fillMaxSize()
         .background(primary)) {
         Spacer(modifier = Modifier.fillMaxHeight(0.25f))
-            Image(painter = painter, contentDescription = "Piggy logo",
-                modifier = Modifier
-                    .requiredSize(width = 250.dp, height = 250.dp)
-                    .align(Alignment.CenterHorizontally))
+        Image(painter = painter, contentDescription = "Piggy logo",
+            modifier = Modifier
+                .requiredSize(width = 250.dp, height = 250.dp)
+                .align(Alignment.CenterHorizontally))
 
-            Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-            Text(text = "Monitor your savings with your personal piggy bank.",
-                fontSize = 14.sp, color = Color.Black, fontFamily = KronaOne, textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(start = 20.dp, end = 20.dp))
+        Text(text = "Monitor your savings with your personal piggy bank.",
+            fontSize = 14.sp, color = Color.Black, fontFamily = KronaOne, textAlign = TextAlign.Center,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(start = 20.dp, end = 20.dp))
 
         Box(modifier = Modifier
             .fillMaxSize()

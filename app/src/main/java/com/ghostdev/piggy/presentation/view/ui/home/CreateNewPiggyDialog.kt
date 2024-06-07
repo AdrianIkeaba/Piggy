@@ -42,7 +42,7 @@ import com.ghostdev.piggy.presentation.view.viewmodel.LocalPiggyViewModel
 import com.ghostdev.piggy.utils.removeCommas
 
 @Composable
-fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(), calendarViewModel: CalendarViewModel = viewModel()) {
+fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(), calendarViewModel: CalendarViewModel = viewModel(), piggyModel: PiggyModel) {
     val piggyViewModel = LocalPiggyViewModel.current
 
     var piggyName by remember { mutableStateOf("") }
@@ -52,6 +52,18 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
     val color by remember { mutableStateOf("Color") }
     val selectedColor by viewModel.selectedColor.collectAsState()
     val deadlineDate by calendarViewModel.selectedDate.collectAsState()
+
+    val editPiggy by remember { mutableStateOf(false) }
+
+    if (piggyModel.piggyName != "") {
+        !editPiggy
+        piggyName = piggyModel.piggyName
+        saved = piggyModel.amountSaved.toString()
+        goal = piggyModel.goal.toString()
+        viewModel.selectColor(Color(piggyModel.color))
+        calendarViewModel.selectDate(piggyModel.deadlineDate)
+    }
+
 
 
     var colorDialogShow by remember { mutableStateOf(false) }
@@ -76,7 +88,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Add new Piggy bank",
+                    text = if (editPiggy) "Edit Piggy Bank" else "Create New Piggy Bank",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),

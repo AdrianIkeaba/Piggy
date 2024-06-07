@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ghostdev.piggy.R
+import com.ghostdev.piggy.data.database.PiggyModel
 import com.ghostdev.piggy.presentation.theme.Inter
 import com.ghostdev.piggy.presentation.theme.KronaOne
 import com.ghostdev.piggy.presentation.theme.primary
@@ -55,17 +56,20 @@ import com.ghostdev.piggy.presentation.view.viewmodel.BottomSheetViewModel
 import com.ghostdev.piggy.presentation.view.viewmodel.LocalPiggyViewModel
 import com.ghostdev.piggy.utils.PreferencesHelper
 import com.ghostdev.piggy.utils.formatDecimalSeparator
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
-    PreferencesHelper.setFirstTime(LocalContext.current.applicationContext, true)
+    PreferencesHelper.setFirstTime(LocalContext.current.applicationContext, false)
     val piggyViewModel = LocalPiggyViewModel.current
     val piggyList = piggyViewModel.piggyList.collectAsState()
 
     val totalAmount = remember { mutableDoubleStateOf(0.0) }
     val totalGoal = remember { mutableDoubleStateOf(0.0) }
+
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(piggyList.value) {
         totalAmount.doubleValue = 0.0
@@ -78,6 +82,8 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
             totalAmount.doubleValue += piggy.amountSaved
             totalGoal.doubleValue += piggy.goal
         }
+        delay(50)
+        isLoading = false
     }
 
     val scope = rememberCoroutineScope()
@@ -120,7 +126,7 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
         },
         sheetContainerColor = primary,
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,// Set initial peek height to 0
+        sheetPeekHeight = 0.dp,
         sheetContent = {
             BottomSheetContent()
         }) {
@@ -140,39 +146,55 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
                 )
             }
 
-            if (piggyList.value.isEmpty()) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.88f),
-                    contentAlignment = Alignment.Center) {
-                    Column {
-                        Image(painter = painterResource(id = R.drawable.no_piggy_banks),
-                            contentDescription = "No Piggy Banks",
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                        Text(text = "Create a new piggy bank to start saving!",
-                            textAlign = TextAlign.Center,
-                            color = Color.Black,
-                            fontFamily = KronaOne,
-                            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-                        )
-                    }
-                }
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.88f),
+                    contentAlignment = Alignment.Center
+                ) { }
             } else {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.88f)
-                    .padding(16.dp)) {
-                    LazyColumn {
-                        items(piggyList.value.size) {
-                            PiggyBankCard(piggyList.value[it])
+                if (piggyList.value.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.88f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column {
+                            Image(
+                                painter = painterResource(id = R.drawable.no_piggy_banks),
+                                contentDescription = "No Piggy Banks",
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                            Text(
+                                text = "Create a new piggy bank to start saving!",
+                                textAlign = TextAlign.Center,
+                                color = Color.Black,
+                                fontFamily = KronaOne,
+                                modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                            )
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.88f)
+                            .padding(16.dp)
+                    ) {
+                        LazyColumn {
+                            items(piggyList.value.size) {
+                                PiggyBankCard(piggyList.value[it])
+                            }
                         }
                     }
                 }
             }
 
             Box(modifier = Modifier.fillMaxHeight()) {
-                BottomAppBar(containerColor = secondary,
+                BottomAppBar(
+                    containerColor = secondary,
                     actions = {
                         IconButton(onClick = {
                             scope.launch {
@@ -195,7 +217,11 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
                             containerColor = tertiary,
                             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                         ) {
-                            Icon(Icons.Filled.Add, "Add PiggyBank", tint = Color.White, modifier = Modifier.clickable { createDialogShow = true })
+                            Icon(
+                                Icons.Filled.Add,
+                                "Add PiggyBank",
+                                tint = Color.White,
+                                modifier = Modifier.clickable { createDialogShow = true })
                         }
                     }
                 )
@@ -203,6 +229,9 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
         }
     }
     if (createDialogShow) {
-        CreateNewPiggy(onDismiss = { createDialogShow = false })
+        CreateNewPiggy(
+            onDismiss = { createDialogShow = false },
+            piggyModel = PiggyModel(0, "", 0.0, 0.0, "", 0, false)
+        )
     }
 }
