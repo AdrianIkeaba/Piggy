@@ -19,5 +19,5 @@ fun String.formatDecimalSeparator(): String {
 }
 
 fun String.removeCommas(): Int {
-    return this.replace(",", "").toInt()
+    return this.replace(",", "").replace(".", "").toInt()
 }

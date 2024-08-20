@@ -83,7 +83,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
             modifier = Modifier
                 .wrapContentHeight(),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFEEF1ED) // Adjust color as needed
+                containerColor = Color(0xFFEEF1ED)
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -140,7 +140,7 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp),
-                    label = { Text(text = "Goal (Optional)") },
+                    label = { Text(text = "Goal") },
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Gray,
@@ -232,16 +232,27 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
                     )
                     Text(text = "Save",
                         fontSize = 16.sp,
-                        color = Color.Gray,
+                        color = if (completedFields(piggyName, saved, selectedColor, deadline, goal)) Color.Blue else Color.Gray,
                         modifier = Modifier.padding(end = 16.dp)
                             .clickable {
-                                if (piggyName.isNotEmpty() && saved.isNotEmpty() && selectedColor != null && deadline.isNotEmpty() && goal.isNotEmpty()) {
-                                    val piggyBank = PiggyModel(0, piggyName, saved.removeCommas().toDouble(), goal.removeCommas().toDouble(), deadline, selectedColor!!.toArgb(), false)
-                                    piggyViewModel.createPiggy(piggyBank)
-                                    piggyViewModel.getAllPiggyBanks()
-                                    onDismiss()
-                                    calendarViewModel.selectDate("")
-                                    viewModel.resetColor()
+                                if (piggyModel.piggyName != "") {
+                                    if (completedFields(piggyName, saved, selectedColor, deadline, goal)) {
+                                        val piggyBank = PiggyModel(piggyModel.id, piggyName, saved.removeCommas().toDouble(), goal.removeCommas().toDouble(), deadline, selectedColor!!.toArgb(), false)
+                                        piggyViewModel.updatePiggy(piggyBank)
+                                        piggyViewModel.getAllPiggyBanks()
+                                        onDismiss()
+                                        calendarViewModel.selectDate("")
+                                        viewModel.resetColor()
+                                    }
+                                } else {
+                                    if (completedFields(piggyName, saved, selectedColor, deadline, goal)) {
+                                        val piggyBank = PiggyModel(0, piggyName, saved.removeCommas().toDouble(), goal.removeCommas().toDouble(), deadline, selectedColor!!.toArgb(), false)
+                                        piggyViewModel.createPiggy(piggyBank)
+                                        piggyViewModel.getAllPiggyBanks()
+                                        onDismiss()
+                                        calendarViewModel.selectDate("")
+                                        viewModel.resetColor()
+                                    }
                                 }
                             }
                         )
@@ -255,4 +266,9 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
     if (calendarDialogShow) {
         CalendarDialog(onDismiss = {calendarDialogShow = false})
     }
+
 }
+fun completedFields(piggyName: String, saved: String, selectedColor: Color?, deadline: String, goal: String): Boolean {
+    return piggyName.isNotEmpty() && saved.isNotEmpty() && selectedColor != null && deadline.isNotEmpty() && goal.isNotEmpty()
+}
+

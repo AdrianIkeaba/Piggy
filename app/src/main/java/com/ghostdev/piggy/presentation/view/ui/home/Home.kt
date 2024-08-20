@@ -210,7 +210,7 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(Icons.Outlined.Settings, contentDescription = "Settings", tint = Color.Black)
                         }
-                    },
+                    }
                     floatingActionButton = {
                         FloatingActionButton(
                             onClick = { createDialogShow = true },
@@ -220,8 +220,7 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
                             Icon(
                                 Icons.Filled.Add,
                                 "Add PiggyBank",
-                                tint = Color.White,
-                                modifier = Modifier.clickable { createDialogShow = true })
+                                tint = Color.White)
                         }
                     }
                 )

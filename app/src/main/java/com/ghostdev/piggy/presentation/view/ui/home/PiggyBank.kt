@@ -76,6 +76,9 @@ fun PiggyBankCard(piggyData: PiggyModel) {
     var showDeleteDialog by remember {
         mutableStateOf(false)
     }
+    var showEditDialog by remember {
+        mutableStateOf(false)
+    }
     val piggyName = piggyData.piggyName
     val amountSaved = piggyData.amountSaved
     val goal = piggyData.goal
@@ -100,9 +103,6 @@ fun PiggyBankCard(piggyData: PiggyModel) {
         mutableStateOf(false)
     }
     var dropDownStateQuickEdit by remember {
-        mutableStateOf(false)
-    }
-    var pinState by remember {
         mutableStateOf(false)
     }
     var amount by remember {
@@ -159,27 +159,6 @@ fun PiggyBankCard(piggyData: PiggyModel) {
                         color = Color.Black,
                         modifier = Modifier.padding(top = 8.dp)
                     )
-
-                    if (pinState) {
-                        IconButton(onClick = { pinState = !pinState
-                            piggyViewModel.unpinPiggy(piggyData)
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.pin_filled),
-                                contentDescription = "Pin",
-                                tint = Color.Black
-                            )
-                        }
-                    } else {
-                        IconButton(onClick = { pinState = !pinState
-                            piggyViewModel.pinPiggy(piggyData) }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.pin_outlined),
-                                contentDescription = "Pin",
-                                tint = Color.Black
-                            )
-                        }
-                    }
 
                 }
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -369,7 +348,8 @@ fun PiggyBankCard(piggyData: PiggyModel) {
                 {
                     Image(
                         painter = painterResource(id = R.drawable.edit),
-                        contentDescription = "Edit"
+                        contentDescription = "Edit",
+                        modifier = Modifier.clickable { showEditDialog = true }
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Image(painter = painterResource(id = R.drawable.delete),
@@ -388,43 +368,10 @@ fun PiggyBankCard(piggyData: PiggyModel) {
             piggyViewModel = piggyViewModel
         )
     }
-}
-@Composable
-fun DeleteDialog(onDismiss: () -> Unit, piggyData: PiggyModel, piggyViewModel: PiggyViewModel) {
-    AlertDialog(
-        icon = {
-            Icon(
-                painter = painterResource(id = R.drawable.delete),
-                contentDescription = "Example Icon"
-            )
-        },
-        title = {
-            Text(text = "Delete Piggy?")
-        },
-        text = {
-            Text(text = "Are you sure you want to delete this piggy?")
-        },
-        onDismissRequest = {
-            onDismiss()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    piggyViewModel.deletePiggy(piggyData)
-                    onDismiss()
-                }
-            ) {
-                Text("Delete")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismiss()
-                }
-            ) {
-                Text("Dismiss")
-            }
-        }
-    )
+    if (showEditDialog) {
+        CreateNewPiggy(
+            onDismiss = { showEditDialog = false },
+            piggyModel = piggyData
+        )
+    }
 }
