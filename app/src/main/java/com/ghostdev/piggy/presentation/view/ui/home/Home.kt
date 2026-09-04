@@ -210,7 +210,7 @@ fun HomeScreen(filterViewModel: BottomSheetViewModel = viewModel()) {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(Icons.Outlined.Settings, contentDescription = "Settings", tint = Color.Black)
                         }
-                    }
+                    },
                     floatingActionButton = {
                         FloatingActionButton(
                             onClick = { createDialogShow = true },

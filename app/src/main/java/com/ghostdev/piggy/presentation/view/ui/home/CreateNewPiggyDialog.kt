@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -86,14 +87,14 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
                 containerColor = Color(0xFFEEF1ED)
             )
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(22.dp)) {
                 Text(
-                    text = if (editPiggy) "Edit Piggy Bank" else "Create New Piggy Bank",
+                    text = if (editPiggy) "Edit Piggy Bank" else "Create New Piggy",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),
                     color = Color.Black,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = 19.sp
                 )
 
@@ -112,7 +113,8 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
                         focusedLabelColor = Color.Black,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
-                    )
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                 )
 
                 OutlinedTextField(
@@ -233,11 +235,31 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
                     Text(text = "Save",
                         fontSize = 16.sp,
                         color = if (completedFields(piggyName, saved, selectedColor, deadline, goal)) Color.Blue else Color.Gray,
-                        modifier = Modifier.padding(end = 16.dp)
+                        modifier = Modifier
+                            .padding(end = 16.dp)
                             .clickable {
                                 if (piggyModel.piggyName != "") {
-                                    if (completedFields(piggyName, saved, selectedColor, deadline, goal)) {
-                                        val piggyBank = PiggyModel(piggyModel.id, piggyName, saved.removeCommas().toDouble(), goal.removeCommas().toDouble(), deadline, selectedColor!!.toArgb(), false)
+                                    if (completedFields(
+                                            piggyName,
+                                            saved,
+                                            selectedColor,
+                                            deadline,
+                                            goal
+                                        )
+                                    ) {
+                                        val piggyBank = PiggyModel(
+                                            piggyModel.id,
+                                            piggyName,
+                                            saved
+                                                .removeCommas()
+                                                .toDouble(),
+                                            goal
+                                                .removeCommas()
+                                                .toDouble(),
+                                            deadline,
+                                            selectedColor!!.toArgb(),
+                                            false
+                                        )
                                         piggyViewModel.updatePiggy(piggyBank)
                                         piggyViewModel.getAllPiggyBanks()
                                         onDismiss()
@@ -245,8 +267,27 @@ fun CreateNewPiggy(onDismiss: () -> Unit, viewModel: ColorViewModel = viewModel(
                                         viewModel.resetColor()
                                     }
                                 } else {
-                                    if (completedFields(piggyName, saved, selectedColor, deadline, goal)) {
-                                        val piggyBank = PiggyModel(0, piggyName, saved.removeCommas().toDouble(), goal.removeCommas().toDouble(), deadline, selectedColor!!.toArgb(), false)
+                                    if (completedFields(
+                                            piggyName,
+                                            saved,
+                                            selectedColor,
+                                            deadline,
+                                            goal
+                                        )
+                                    ) {
+                                        val piggyBank = PiggyModel(
+                                            0,
+                                            piggyName,
+                                            saved
+                                                .removeCommas()
+                                                .toDouble(),
+                                            goal
+                                                .removeCommas()
+                                                .toDouble(),
+                                            deadline,
+                                            selectedColor!!.toArgb(),
+                                            false
+                                        )
                                         piggyViewModel.createPiggy(piggyBank)
                                         piggyViewModel.getAllPiggyBanks()
                                         onDismiss()

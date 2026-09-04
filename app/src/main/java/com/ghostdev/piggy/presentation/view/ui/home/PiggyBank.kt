@@ -113,7 +113,7 @@ fun PiggyBankCard(piggyData: PiggyModel) {
         mutableDoubleStateOf(0.0)
     }
     LaunchedEffect(piggyData.amountSaved) {
-        progress.doubleValue = amountSaved.toDouble() / goal.toDouble()
+        progress.doubleValue = amountSaved / goal
     }
 
     Spacer(modifier = Modifier.height(12.dp))
