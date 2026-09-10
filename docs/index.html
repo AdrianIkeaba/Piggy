@@ -3,9 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Privacy, terms, account deletion, and support for the Piggy savings app.">
-  <title>Piggy - Legal and Support</title>
+  <meta name="description" content="Plan what you want, save at your pace, and track the price with Piggy.">
+  <title>Piggy - Plan, save, and buy at the right time</title>
   <link rel="stylesheet" href="legal.css">
+  <style>
+    .promise-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 28px}
+    .promise-grid div{padding:18px;border:1.5px solid var(--ink);border-radius:12px;background:var(--soft)}
+    .promise-grid strong{font:800 12px ui-monospace,monospace;letter-spacing:.08em}
+    .promise-grid p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.45}
+    @media(max-width:700px){.promise-grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -18,15 +25,21 @@
     </nav>
   </header>
   <main class="hero">
-    <p class="eyebrow">PIGGY / HELP CENTRE</p>
-    <h1>Make room for more.</h1>
-    <p class="lede">Clear information about how Piggy works, how your data is handled, and how to get help.</p>
+    <p class="eyebrow">PIGGY / PLAN WITH PURPOSE</p>
+    <h1>Plan what you want. Save at your pace. Buy when the price is right.</h1>
+    <p class="lede">Piggy turns a purchase into a clear savings plan, keeps your progress visible, and watches the product price for you. Your money always stays wherever you choose to keep it.</p>
+    <div class="promise-grid">
+      <div><strong>01 · PLAN</strong><p>Create a goal with a target and timeline you can actually follow.</p></div>
+      <div><strong>02 · RECORD</strong><p>Log what you save while the real money stays in your bank, wallet, or account.</p></div>
+      <div><strong>03 · WATCH</strong><p>Link the product page and let Piggy alert you when its public price reaches your target.</p></div>
+    </div>
+    <div class="notice"><strong>Piggy is a planning and record-keeping tool.</strong> It is not a bank, wallet, investment platform, broker, or lender. Piggy never receives, holds, transfers, or invests your money.</div>
     <div class="card-grid">
       <a class="card" href="privacy.html"><span>01</span><h2>Privacy policy</h2><p>What Piggy collects, why it is used, and the choices you have.</p></a>
       <a class="card" href="terms.html"><span>02</span><h2>Terms of use</h2><p>The rules and responsibilities that apply when using Piggy.</p></a>
       <a class="card" href="delete-account.html"><span>03</span><h2>Delete your account</h2><p>Remove your Piggy account and associated cloud data.</p></a>
       <a class="card" href="delete-data.html"><span>04</span><h2>Delete selected data</h2><p>Remove individual records while keeping your account.</p></a>
-      <a class="card" href="support.html"><span>05</span><h2>Support</h2><p>Answers to common questions and a direct contact route.</p></a>
+      <a class="card" href="support.html"><span>05</span><h2>How Piggy works</h2><p>Product questions, price tracking, Piggy Plus, support, and direct answers.</p></a>
     </div>
   </main>
   <footer><p>Piggy for Android</p><p>Last updated 9 September 2026</p></footer>
